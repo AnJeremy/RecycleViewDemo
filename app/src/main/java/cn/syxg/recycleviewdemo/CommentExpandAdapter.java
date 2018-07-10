@@ -139,7 +139,7 @@ public class CommentExpandAdapter extends BaseExpandableListAdapter {
 
 
     /**
-     * by moos on 2018/04/20
+     *
      * func:评论成功后插入一条数据
      * @param commentDetailBean 新的评论数据
      */
@@ -156,7 +156,7 @@ public class CommentExpandAdapter extends BaseExpandableListAdapter {
 
 
     /**
-     * by moos on 2018/04/20
+     *
      * func:回复成功后插入一条数据
      * @param replyDetailBean 新的回复数据
      */

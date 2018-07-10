@@ -35,6 +35,7 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
 
 
     CommentExpandAdapter mAdapter;
+    List<CommentDetailBean> commentList;
     /**
      * Same as QuickAdapter#QuickAdapter(Context,int) but with
      * some initialization data.
@@ -90,7 +91,7 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
             case MultiItemBean.COMMENT:
 
                 ExpandableListView expandableListView = helper.getView(R.id.detail_page_lv_comment);
-                List<CommentDetailBean> commentList = generateTestData();
+                 commentList = generateTestData();
                 mAdapter = new CommentExpandAdapter(mContext, commentList);
                 initExpandableListView(mContext,expandableListView,mAdapter,commentList);
 
@@ -117,6 +118,7 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
         Log.d("InfoAdapter","updateComment"+commentDetailBean.getContent());
        if(commentDetailBean != null && mAdapter != null){
            mAdapter.addTheCommentData(commentDetailBean);
+           commentList.add(commentDetailBean);
            //notifyDataSetChanged();
            Log.d("InfoAdapter","updateComment");
        }
@@ -290,7 +292,7 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
      * by moos on 2018/04/20
      * func:弹出回复框
      */
-    public void showReplyDialog(final Context mContext, final int position, final CommentExpandAdapter mAdapter, final ExpandableListView expandableListView, List<CommentDetailBean> commentsList){
+    public void showReplyDialog(final Context mContext, final int position, final CommentExpandAdapter mAdapter, final ExpandableListView expandableListView, final List<CommentDetailBean> commentsList){
         final BottomSheetDialog dialog = new BottomSheetDialog(mContext);
         View commentView = LayoutInflater.from(mContext).inflate(R.layout.comment_dialog_layout,null);
         final EditText commentText = (EditText) commentView.findViewById(R.id.dialog_comment_et);
@@ -306,6 +308,7 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
                     dialog.dismiss();
                     ReplyDetailBean detailBean = new ReplyDetailBean("小红",replyContent);
                     mAdapter.addTheReplyData(detailBean, position);
+                    commentsList.get(position).getReplyList().add(detailBean);
                     expandableListView.expandGroup(position);
                     Toast.makeText(mContext,"回复成功",Toast.LENGTH_SHORT).show();
                 }else {
