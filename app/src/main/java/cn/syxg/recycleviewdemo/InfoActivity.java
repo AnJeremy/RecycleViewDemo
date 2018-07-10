@@ -186,7 +186,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
 
     /**
-     * by moos on 2018/04/20
+     *
      * func:弹出评论框
      */
     private void showCommentDialog(){
@@ -249,7 +249,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
 
     /**
-     * by moos on 2018/04/20
+     *
      * func:弹出回复框
      */
     public void showReplyDialog(final int position){
