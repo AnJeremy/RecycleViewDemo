@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="最新评论"
+        android:textSize="18sp"
+        android:gravity="center_vertical"
+        android:background="@color/colorAccent"
+        android:paddingLeft="10dp"/>
+
+    <!--<android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>-->
+
+    <ExpandableListView
+        android:id="@+id/detail_page_lv_comment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="64dp"
+        android:divider="@null"
+        android:listSelector="@android:color/transparent"
+        android:scrollbars="none">
+
+    </ExpandableListView>
+
+</LinearLayout>

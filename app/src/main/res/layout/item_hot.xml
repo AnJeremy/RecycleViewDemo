@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <ImageView
+            android:id="@+id/iv_hot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/ic_launcher"
+            android:layout_marginRight="15dp"
+            />
+
+        <TextView
+            android:id="@+id/hot_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/iv_hot"
+            android:layout_marginTop="15dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="15dp"
+            android:text="阿大使大赛打啊打啊打扫打扫打扫达啊发达未达到挖四大玩法阿斯达"/>
+
+        <ImageView
+            android:id="@+id/hot_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="15dp"
+            android:layout_alignParentBottom="true"
+            android:src="@mipmap/ic_launcher"
+            android:layout_marginBottom="10dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="asddasdad"
+            android:layout_toRightOf="@id/hot_icon"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="11dp"
+            android:paddingLeft="10dp"
+            />
+
+        <TextView
+            android:id="@+id/hot_sort"
+            android:text="信用卡"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@id/iv_hot"
+            android:layout_width="wrap_content"
+            android:layout_marginBottom="11dp"
+            android:layout_marginRight="10dp"
+            android:layout_height="wrap_content"/>
+
+        <!--<View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_alignParentBottom="true"
+            android:background="#ffd3d3d3"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"/>-->
+    </RelativeLayout>
+
+</RelativeLayout>
