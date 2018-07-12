@@ -107,10 +107,21 @@ public class CommentExpandAdapter extends BaseExpandableListAdapter {
             childHolder = (ChildHolder) convertView.getTag();
         }
         String replyUser = commentBeanList.get(groupPosition).getReplyList().get(childPosition).getNickName();
-        if(!TextUtils.isEmpty(replyUser)){
-            childHolder.tv_name.setText(replyUser + ":");
+        Log.d("AdapterPosition",groupPosition+">>>"+childPosition);
+        if(childPosition >= 2){
+            childHolder.tv_name.setText(" ");
+            childHolder.tv_content.setTextColor(Color.parseColor("#3F51B5"));
+            childHolder.tv_content.setText("点击查看更多！");
+        }else {
+
+            if(!TextUtils.isEmpty(replyUser)){
+                childHolder.tv_name.setText(replyUser + ":");
+            }
+            childHolder.tv_content.setTextColor(Color.parseColor("#949494"));
+            childHolder.tv_content.setText(commentBeanList.get(groupPosition).getReplyList().get(childPosition).getContent());
+
         }
-        childHolder.tv_content.setText(commentBeanList.get(groupPosition).getReplyList().get(childPosition).getContent());
+
         return convertView;
     }
     @Override
@@ -144,6 +155,23 @@ public class CommentExpandAdapter extends BaseExpandableListAdapter {
      * @param commentDetailBean 新的评论数据
      */
     public void addTheCommentData(CommentDetailBean commentDetailBean){
+        if(commentDetailBean!=null){
+
+            commentBeanList.add(0,commentDetailBean);
+            notifyDataSetChanged();
+        }else {
+            throw new IllegalArgumentException("评论数据为空!");
+        }
+
+    }
+
+
+    /**
+     *
+     * func:评论成功后插入一条数据
+     * @param commentDetailBean 新的评论数据
+     */
+    public void addLoadTheCommentData(CommentDetailBean commentDetailBean){
         if(commentDetailBean!=null){
 
             commentBeanList.add(commentDetailBean);

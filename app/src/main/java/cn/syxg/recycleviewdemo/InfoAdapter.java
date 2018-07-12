@@ -48,7 +48,7 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
         addItemType(MultiItemBean.WEBVIEW,R.layout.item_info_webview);
         addItemType(MultiItemBean.INFO,R.layout.item_info);
         addItemType(MultiItemBean.RELATED,R.layout.item_info_related);
-        addItemType(MultiItemBean.COMMENT,R.layout.item_info_comment);
+        //addItemType(MultiItemBean.COMMENT,R.layout.item_info_comment);
     }
 
     @Override
@@ -88,20 +88,21 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
                 mRecyclerView.setAdapter(adapter);
 
                 break;
-            case MultiItemBean.COMMENT:
+           /* case MultiItemBean.COMMENT:
 
-                ExpandableListView expandableListView = helper.getView(R.id.detail_page_lv_comment);
-                 commentList = generateTestData();
+                CommentExpandableListView expandableListView = helper.getView(R.id.detail_page_lv_comment);
+                 //commentList = generateTestData();
+                commentList = item.getCommentList();
                 mAdapter = new CommentExpandAdapter(mContext, commentList);
                 initExpandableListView(mContext,expandableListView,mAdapter,commentList);
 
-               /* if(madapter !=null && mCommentDetailBean != null){
+               *//* if(madapter !=null && mCommentDetailBean != null){
 
                     madapter.addTheCommentData(mCommentDetailBean);
                     Log.d("InfoAdapter","addTheCommentData");
-                }*/
+                }*//*
 
-                break;
+                break;*/
 
 
 
@@ -118,7 +119,7 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
         Log.d("InfoAdapter","updateComment"+commentDetailBean.getContent());
        if(commentDetailBean != null && mAdapter != null){
            mAdapter.addTheCommentData(commentDetailBean);
-           commentList.add(commentDetailBean);
+           //commentList.add(commentDetailBean);
            //notifyDataSetChanged();
            Log.d("InfoAdapter","updateComment");
        }
@@ -141,7 +142,7 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
         webSettings.setUseWideViewPort(true); //将图片调整到适合webview的大小
         webSettings.setLoadWithOverviewMode(true); // 缩放至屏幕的大小
 
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE); //关闭webview中缓存
+        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK); //关闭webview中缓存
         //webSettings.setAllowFileAccess(true); //设置可以访问文件
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true); //支持通过JS打开新窗口
         webSettings.setLoadsImagesAutomatically(true); //支持自动加载图片
@@ -308,7 +309,7 @@ public class InfoAdapter extends BaseMultiItemQuickAdapter<MultiItemBean,BaseVie
                     dialog.dismiss();
                     ReplyDetailBean detailBean = new ReplyDetailBean("小红",replyContent);
                     mAdapter.addTheReplyData(detailBean, position);
-                    commentsList.get(position).getReplyList().add(detailBean);
+                    //commentsList.get(position).getReplyList().add(detailBean);
                     expandableListView.expandGroup(position);
                     Toast.makeText(mContext,"回复成功",Toast.LENGTH_SHORT).show();
                 }else {

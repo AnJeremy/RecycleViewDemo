@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+
     android:orientation="vertical">
 
     <TextView
@@ -19,15 +20,14 @@
 
     </android.support.v7.widget.RecyclerView>-->
 
-    <ExpandableListView
+    <cn.syxg.recycleviewdemo.CommentExpandableListView
         android:id="@+id/detail_page_lv_comment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="64dp"
         android:divider="@null"
         android:listSelector="@android:color/transparent"
         android:scrollbars="none">
 
-    </ExpandableListView>
+    </cn.syxg.recycleviewdemo.CommentExpandableListView>
 
 </LinearLayout>

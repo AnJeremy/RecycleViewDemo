@@ -1,9 +1,12 @@
 package cn.syxg.recycleviewdemo;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,13 +15,18 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +38,13 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
     private TextView bt_comment;
     List<MultiItemBean> multiItemBeans = new ArrayList<>();
     BottomSheetDialog dialog;
+    MultiItemBean comMultiItemBean;
 
-    private List<CommentDetailBean> commentsList;
+    SwipeRefreshLayout mRefreshLayout;
+
+    private CommentExpandableListView mExpandableListView;
+    CommentExpandAdapter mExpandAdapter;
+    List<CommentDetailBean> commentList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,12 +52,17 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         bt_comment = (TextView) findViewById(R.id.detail_page_do_comment);
         bt_comment.setOnClickListener(this);
         mRecyclerView = findViewById(R.id.info_view);
+        mRefreshLayout = findViewById(R.id.info_refresh);
         multiItemBeans.add(new MultiItemBean(MultiItemBean.WEBVIEWTITLE));
 
         multiItemBeans.add(new MultiItemBean(MultiItemBean.WEBVIEW));
         multiItemBeans.add(new MultiItemBean(MultiItemBean.INFO));
         multiItemBeans.add(new MultiItemBean(MultiItemBean.RELATED));
-        multiItemBeans.add(new MultiItemBean(MultiItemBean.COMMENT));
+        //MultiItemBean comMultiItemBean = new MultiItemBean(MultiItemBean.COMMENT);
+        commentList = generateTestData();
+        //comMultiItemBean.setCommentList(commentList);
+        //multiItemBeans.add(comMultiItemBean);
+
 
         adapter = new InfoAdapter(multiItemBeans);
 
@@ -55,8 +73,150 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         loadUrl(mWebView,"https://activity.xianjincard.com/register?source_tag=H5-waik2&style=3&download=1&company=1");
 
         adapter.addHeaderView(mTop);*/
+        //可能会出现变白情况
+        View mFoot = getLayoutInflater().inflate(R.layout.item_info_comment, (ViewGroup) mRecyclerView.getParent(), false);
+
+
+        mExpandableListView = mFoot.findViewById(R.id.detail_page_lv_comment);
+        mExpandableListView.setGroupIndicator(null);
+        mExpandAdapter = new CommentExpandAdapter(this, commentList);
+        //initExpandableListView(this,mExpandableListView,mExpandAdapter,commentList);
+        mExpandableListView.setAdapter(mExpandAdapter);
+        for(int i = 0; i<commentList.size(); i++){
+            mExpandableListView.expandGroup(i);
+        }
+
+        mExpandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int groupPosition, long l) {
+                boolean isExpanded = expandableListView.isGroupExpanded(groupPosition);
+                // Log.e(TAG, "onGroupClick: 当前的评论id>>>"+commentList.get(groupPosition).getId());
+//                if(isExpanded){
+//                    expandableListView.collapseGroup(groupPosition);
+//                }else {
+//                    expandableListView.expandGroup(groupPosition, true);
+//                }
+
+                Toast.makeText(InfoActivity.this,"点击了回复"+commentList.get(groupPosition).getNickName(),Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long l) {
+
+
+                if(commentList.get(groupPosition).getReplyList().size() > 2){
+                    Toast.makeText(InfoActivity.this,"点击查看更多",Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(InfoActivity.this,"点击了回复"+commentList.get(groupPosition).getReplyList().get(childPosition).getNickName(),Toast.LENGTH_SHORT).show();
+                    showReplyDialog(groupPosition);
+
+                }
+
+                return false;
+            }
+        });
+        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+
+                Toast.makeText(InfoActivity.this,"点击了展开"+groupPosition,Toast.LENGTH_SHORT).show();
+                //toast("展开第"+groupPosition+"个分组");
+            }
+        });
+
+        adapter.addFooterView(mFoot);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(adapter);
+
+
+        adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                //adapter.setEnableLoadMore(true);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                       // commentList.add();
+
+                        mExpandAdapter.addLoadTheCommentData(new CommentDetailBean("小花","今天天气不错","刚刚"));
+                        adapter.loadMoreComplete();
+                        //adapter.setEnableLoadMore(false);
+                    }
+                }, 2000);
+
+            }
+        });
+
+
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //adapter.setEnableLoadMore(false);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        Toast.makeText(InfoActivity.this,"刷新成功！",Toast.LENGTH_SHORT).show();
+
+                      /*  // commentList.add();
+
+                        mExpandAdapter.addLoadTheCommentData(new CommentDetailBean("小花","今天天气不错","刚刚"));
+                        adapter.loadMoreComplete();
+                        adapter.setEnableLoadMore(false);*/
+
+                      mRefreshLayout.setRefreshing(false);
+                    }
+                }, 2000);
+
+            }
+        });
+    }
+
+
+
+    /**
+     * 初始化评论和回复列表
+     */
+    private void initExpandableListView(final Context mContext, ExpandableListView expandableListView,  CommentExpandAdapter adapter, final List<CommentDetailBean> commentList){
+        expandableListView.setGroupIndicator(null);
+        //默认展开所有回复
+        adapter = new CommentExpandAdapter(mContext, commentList);
+        expandableListView.setAdapter(adapter);
+        for(int i = 0; i<commentList.size(); i++){
+            expandableListView.expandGroup(i);
+        }
+        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int groupPosition, long l) {
+                boolean isExpanded = expandableListView.isGroupExpanded(groupPosition);
+               // Log.e(TAG, "onGroupClick: 当前的评论id>>>"+commentList.get(groupPosition).getId());
+//                if(isExpanded){
+//                    expandableListView.collapseGroup(groupPosition);
+//                }else {
+//                    expandableListView.expandGroup(groupPosition, true);
+//                }
+
+                Toast.makeText(mContext,"点击了回复"+commentList.get(groupPosition).getNickName(),Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long l) {
+                Toast.makeText(mContext,"点击了回复"+commentList.get(groupPosition).getReplyList().get(childPosition).getNickName(),Toast.LENGTH_SHORT).show();
+                //showReplyDialog(mContext,groupPosition,adapter,expandableListView,commentList);
+                return false;
+            }
+        });
+        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                //toast("展开第"+groupPosition+"个分组");
+            }
+        });
     }
 
 
@@ -213,9 +373,11 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                     //commentOnWork(commentContent);
                     dialog.dismiss();
                     CommentDetailBean detailBean = new CommentDetailBean("小明", commentContent,"刚刚");
-                    //adapter.addTheCommentData(detailBean);//添加数据
-                    adapter.updateComment(detailBean);
-                    //adapter.addData(MultiItemBean.COMMENT,detailBean);
+                    mExpandAdapter.addTheCommentData(detailBean);//添加数据
+                    //commentList.add(detailBean);
+                    //adapter.updateComment(detailBean);
+                    //comMultiItemBean.setCommentList(commentList);
+                    //adapter.addData(MultiItemBean.COMMENT,comMultiItemBean);
                     Toast.makeText(InfoActivity.this,"评论成功",Toast.LENGTH_SHORT).show();
 
                 }else {
@@ -257,7 +419,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         View commentView = LayoutInflater.from(this).inflate(R.layout.comment_dialog_layout,null);
         final EditText commentText = (EditText) commentView.findViewById(R.id.dialog_comment_et);
         final Button bt_comment = (Button) commentView.findViewById(R.id.dialog_comment_bt);
-        commentText.setHint("回复 " + commentsList.get(position).getNickName() + " 的评论:");
+        commentText.setHint("回复 " + commentList.get(position).getNickName() + " 的评论:");
         dialog.setContentView(commentView);
         bt_comment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -267,7 +429,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
                     dialog.dismiss();
                     ReplyDetailBean detailBean = new ReplyDetailBean("小红",replyContent);
-                    //adapter.addTheReplyData(detailBean, position);
+                    mExpandAdapter.addTheReplyData(detailBean, position);
                     //expandableListView.expandGroup(position);
                     Toast.makeText(InfoActivity.this,"回复成功",Toast.LENGTH_SHORT).show();
                 }else {
@@ -297,4 +459,71 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         });
         dialog.show();
     }
+
+
+
+    /**
+     * func:生成测试数据
+     * @return 评论数据
+     */
+    private List<CommentDetailBean> generateTestData(){
+        Gson gson = new Gson();
+        CommentBean commentBean = gson.fromJson(testJson, CommentBean.class);
+        List<CommentDetailBean> commentList = commentBean.getData().getList();
+        return commentList;
+    }
+
+    private String testJson = "{\n" +
+            "\t\"code\": 1000,\n" +
+            "\t\"message\": \"查看评论成功\",\n" +
+            "\t\"data\": {\n" +
+            "\t\t\"total\": 3,\n" +
+            "\t\t\"list\": [{\n" +
+            "\t\t\t\t\"id\": 42,\n" +
+            "\t\t\t\t\"nickName\": \"程序猿\",\n" +
+            "\t\t\t\t\"userLogo\": \"http://ucardstorevideo.b0.upaiyun.com/userLogo/9fa13ec6-dddd-46cb-9df0-4bbb32d83fc1.png\",\n" +
+            "\t\t\t\t\"content\": \"时间是一切财富中最宝贵的财富。\",\n" +
+            "\t\t\t\t\"imgId\": \"xcclsscrt0tev11ok364\",\n" +
+            "\t\t\t\t\"replyTotal\": 1,\n" +
+            "\t\t\t\t\"createDate\": \"三分钟前\",\n" +
+            "\t\t\t\t\"replyList\": [{\n" +
+            "\t\t\t\t\t\"nickName\": \"沐風\",\n" +
+            "\t\t\t\t\t\"userLogo\": \"http://ucardstorevideo.b0.upaiyun.com/userLogo/9fa13ec6-dddd-46cb-9df0-4bbb32d83fc1.png\",\n" +
+            "\t\t\t\t\t\"id\": 40,\n" +
+            "\t\t\t\t\t\"commentId\": \"42\",\n" +
+            "\t\t\t\t\t\"content\": \"时间总是在不经意中擦肩而过,不留一点痕迹.\",\n" +
+            "\t\t\t\t\t\"status\": \"01\",\n" +
+            "\t\t\t\t\t\"createDate\": \"一个小时前\"\n" +
+            "\t\t\t\t}]\n" +
+            "\t\t\t},\n" +
+            "\t\t\t{\n" +
+            "\t\t\t\t\"id\": 41,\n" +
+            "\t\t\t\t\"nickName\": \"设计狗\",\n" +
+            "\t\t\t\t\"userLogo\": \"http://ucardstorevideo.b0.upaiyun.com/userLogo/9fa13ec6-dddd-46cb-9df0-4bbb32d83fc1.png\",\n" +
+            "\t\t\t\t\"content\": \"这世界要是没有爱情，它在我们心中还会有什么意义！这就如一盏没有亮光的走马灯。\",\n" +
+            "\t\t\t\t\"imgId\": \"xcclsscrt0tev11ok364\",\n" +
+            "\t\t\t\t\"replyTotal\": 1,\n" +
+            "\t\t\t\t\"createDate\": \"一天前\",\n" +
+            "\t\t\t\t\"replyList\": [{\n" +
+            "\t\t\t\t\t\"nickName\": \"沐風\",\n" +
+            "\t\t\t\t\t\"userLogo\": \"http://ucardstorevideo.b0.upaiyun.com/userLogo/9fa13ec6-dddd-46cb-9df0-4bbb32d83fc1.png\",\n" +
+            "\t\t\t\t\t\"commentId\": \"41\",\n" +
+            "\t\t\t\t\t\"content\": \"时间总是在不经意中擦肩而过,不留一点痕迹.\",\n" +
+            "\t\t\t\t\t\"status\": \"01\",\n" +
+            "\t\t\t\t\t\"createDate\": \"三小时前\"\n" +
+            "\t\t\t\t}]\n" +
+            "\t\t\t},\n" +
+            "\t\t\t{\n" +
+            "\t\t\t\t\"id\": 40,\n" +
+            "\t\t\t\t\"nickName\": \"产品喵\",\n" +
+            "\t\t\t\t\"userLogo\": \"http://ucardstorevideo.b0.upaiyun.com/userLogo/9fa13ec6-dddd-46cb-9df0-4bbb32d83fc1.png\",\n" +
+            "\t\t\t\t\"content\": \"笨蛋自以为聪明，聪明人才知道自己是笨蛋。\",\n" +
+            "\t\t\t\t\"imgId\": \"xcclsscrt0tev11ok364\",\n" +
+            "\t\t\t\t\"replyTotal\": 0,\n" +
+            "\t\t\t\t\"createDate\": \"三天前\",\n" +
+            "\t\t\t\t\"replyList\": []\n" +
+            "\t\t\t}\n" +
+            "\t\t]\n" +
+            "\t}\n" +
+            "}";
 }

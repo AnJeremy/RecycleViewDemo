@@ -36,6 +36,8 @@
             android:textColor="#949494"
             android:textSize="14sp"
             android:text="世上本没有路，走的人多了，也就成了路"/>
+
+
     </LinearLayout>
 
 </LinearLayout>
